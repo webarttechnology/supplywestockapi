@@ -1,4 +1,4 @@
-const stripe = require('stripe')('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');
+const stripe = require('stripe')('sk_test_51KqwahSGaCSVUxPYRxkYFeHieZHiXtnmyhezBLiOZJSFC19FCvPeQDq3kDEzqjRgReDrgMARZns8YDuwUCeLeK1D00tMoJCkqG');
 const chatModel = require('../chat/chat.service');
 const orderModel = require("../order/order.service");
 const mongoose = require("mongoose");
@@ -43,7 +43,7 @@ const createPaymentLink = async (req, res) => {
     
           const price = await stripe.prices.create({
             unit_amount: orderObj.finalAmount*100,
-            currency: 'usd',
+            currency: 'inr',
             product: product.id,
           });
         
@@ -55,7 +55,7 @@ const createPaymentLink = async (req, res) => {
                 quantity: 1,
               },
             ],
-            after_completion: {type: 'redirect', redirect: {url: 'https://example.com'}},
+            after_completion: {type: 'redirect', redirect: {url: 'http://supplywestock.com'}},
           });
 
           const chat = new chatModel({

@@ -104,10 +104,11 @@ io.on('connection', function(socket){
           $match: {chatroomId: mongoose.Types.ObjectId(msg.chatroomId)}
       },
       {
-          $project: {"user.firstName": 1, "user.lastName": 1, "chatroomId": 1, 'userCode': 1, senderId: 1, message: 1, createdAt: 1}
+          $project: {"user.firstName": 1, "user.lastName": 1, "chatroomId": 1, 'user.userCode': 1, senderId: 1, message: 1, createdAt: 1}
       }])
 
-      socket.broadcast.emit('receiveChat', getAllMsg);
+        console.log(getAllMsg);
+	socket.broadcast.emit('receiveChat', getAllMsg);
   })
  
 
