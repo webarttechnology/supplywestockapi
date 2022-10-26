@@ -99,7 +99,7 @@ const getOrder = async (req, res) => {
             }
         },
         {
-            $project: {"enquiry.product_des": 1, "enquiry.size": 1, "enquiry.quantities": 1, "enquiry.enquiryCode": 1, "seller.firstName":1, "seller.lastName": 1, "buyer.firstName": 1, "buyer.lastName": 1, unitPrice: 1, quantities: 1, productName: 1, totalAmount: 1, finalAmount: 1}
+            $project: {"enquiry.product_des": 1, isPaid: 1,  "enquiry.size": 1, "enquiry.quantities": 1, "enquiry.enquiryCode": 1, "seller.firstName":1, "seller.lastName": 1, "buyer.firstName": 1, "buyer.lastName": 1, unitPrice: 1, quantities: 1, productName: 1, totalAmount: 1, finalAmount: 1}
         }]);
         return res.status(200).json({
             success:1,
@@ -160,7 +160,7 @@ const getorderBySellerId = async (req, res) => {
             $match: {sellerId: mongoose.Types.ObjectId(req.params.sellerId)}
         },
         {
-            $project: {"enquiry.product_des": 1, "enquiry.size": 1, "enquiry.quantities": 1, "enquiry.enquiryCode": 1, "seller.firstName":1, "seller.lastName": 1, "buyer.firstName": 1, "buyer.lastName": 1, unitPrice: 1, quantities: 1, productName: 1, totalAmount: 1, finalAmount: 1}
+            $project: {"enquiry.product_des": 1, "enquiry.size": 1, "enquiry.quantities": 1, "enquiry.enquiryCode": 1, "seller.firstName":1, "seller.lastName": 1, "buyer.firstName": 1, "buyer.lastName": 1, unitPrice: 1, quantities: 1, productName: 1, totalAmount: 1, finalAmount: 1, isPaid: 1}
         }]);
 
 
@@ -206,7 +206,7 @@ const getorderByBuyerId = async (req, res) => {
             $match: {buyerId: mongoose.Types.ObjectId(req.params.buyerId)}
         },
         {
-            $project: {"enquiry.product_des": 1, "enquiry.size": 1, "enquiry.quantities": 1, "enquiry.enquiryCode": 1, "seller.firstName":1, "seller.lastName": 1, "buyer.firstName": 1, "buyer.lastName": 1, unitPrice: 1, quantities: 1, productName: 1, totalAmount: 1, finalAmount: 1}
+            $project: {"enquiry.product_des": 1, "enquiry.size": 1, "enquiry.quantities": 1, "enquiry.enquiryCode": 1, "seller.firstName":1, "seller.lastName": 1, "buyer.firstName": 1, "buyer.lastName": 1, unitPrice: 1, quantities: 1, productName: 1, totalAmount: 1, finalAmount: 1, isPaid: 1}
         }]);
 
 

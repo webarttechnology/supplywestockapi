@@ -8,7 +8,9 @@ const orderSchema = new mongoose.Schema({
     productName: {type: String},
     totalAmount: {type: Number},
     finalAmount: { type: Number},
-    chatRoomId: {type: mongoose.Types.ObjectId}
+    chatRoomId: {type: mongoose.Types.ObjectId},
+    stripeId: {type: String},
+    isPaid: {type: String, Enum:["unpaid", "paid"], default: "unpaid"}
 }, {timestamps: true})
 
 module.exports = mongoose.model("Orders", orderSchema);
