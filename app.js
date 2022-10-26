@@ -22,6 +22,7 @@ const chatRouter = require("./v1/chat/chat.router");
 const orderRouter = require("./v1/order/order.router");
 const paymentRouter = require('./v1/payment/payment.router');
 const additionalChargesRouter = require("./v1/additioncharge/charge.router");
+const pushnotificationRouter = require("./v1/pushnotification/pushnotification.router");
 
 const upload = multer({
 	limits: { fieldSize: 25 * 1024 * 1024 }
@@ -45,6 +46,7 @@ app.use("/v1/chat", chatRouter);
 app.use("/v1/order", orderRouter);
 app.use("/v1/payment", paymentRouter);
 app.use("/v1/charges", additionalChargesRouter);
+app.use("/v1/pushnotification", pushnotificationRouter);
 
 
 http.listen(configData.PORT, '0.0.0.0', () => {
@@ -53,12 +55,15 @@ http.listen(configData.PORT, '0.0.0.0', () => {
 
 const chatModel = require("./v1/chat/chat.service");
 const chatroomModel = require("./v1/chatroom/chatroom.service");
-
+const pushnotificationModel = require("./v1/pushnotification/pushnotification.service");
 const { mongoose } = require("mongoose");
 
-io.on('connection', function(socket){
+io.on('connection', async function(socket){
 
   socket.on('createChat', async function(msg){
+
+    
+
       const createMessage = new chatModel({
         chatroomId: mongoose.Types.ObjectId(msg.chatroomId),
         senderId: mongoose.Types.ObjectId(msg.senderId),
@@ -111,11 +116,7 @@ io.on('connection', function(socket){
 	socket.broadcast.emit('receiveChat', getAllMsg);
   })
  
-
-
-
 socket.on('chatroom', async function(msg){ 
-  console.log(msg.userCode);
   const chatroom = await chatroomModel.aggregate([
     {
         '$sort': {
@@ -164,24 +165,27 @@ socket.on('chatroom', async function(msg){
         const unseenCode = await chatModel.find({chatroomId: records[i]._id, senderId: {"$ne": msg.userCode}, isSeen: "0"}).count();
         records[i].unseenCount = unseenCode;
         result.push(records[i]);
-     }
-	
-    const chatroomObj = {chatroom: result, showid: msg.userCode}
-    console.log(chatroomObj);
-    socket.broadcast.emit('receiveChatRoom', chatroomObj);
-    
-});
+     }	
+        const chatroomObj = {chatroom: result, showid: msg.userCode}
+        socket.broadcast.emit('receiveChatRoom', chatroomObj);
+
+   });
 })
 
+// For notification 
 
+socket.on('notification', async (data) => {
+    const pushObj  = await pushnotificationModel.find({showFor: mongoose.Types.ObjectId(data.id)}, {message: 1, redirectTo: 1, _id: 0, showFor: 1})
+    const notificationData = {notification: pushObj, show: data.id}
+    socket.broadcast.emit('receiveNotification', notificationData);
+})
 
-
-  socket.on('typing', (data)=>{
+socket.on('typing', (data)=>{
     if(data.typing==true)
        io.emit('display', data)
     else
        io.emit('display', data)
-    })
+})
 });
 
 

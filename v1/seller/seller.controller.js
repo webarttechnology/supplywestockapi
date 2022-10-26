@@ -50,7 +50,7 @@ const createSeller = async (req, res) => {
 
 
         const buyerObj = new sellerModel({
-            userCode: Math.random().toString().substr(2, 6),
+            userCode: Math.random().toString().substr(2, 4),
 	    firstName: body.firstName,
             lastName: body.lastName,
             mobileNo: body.mobileNo,
