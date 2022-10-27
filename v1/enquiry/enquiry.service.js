@@ -1,6 +1,7 @@
 const mongoose = require("mongoose")
 
 const enquirySchema = new mongoose.Schema({
+        enquiryId: {type: String, required: [true, "Enquiry Id is a require field"]},
         buyerId: {type: mongoose.Types.ObjectId, required: [true, "Buyer id is a require field"]}, 
         manufacturerId: {type: mongoose.Types.ObjectId, required: [true, "Manufacturer id is a require field"]},
         enquiryCode: {type: String, required: [true, "Enquiry code is a require field"]},

@@ -33,8 +33,9 @@ const createOrder = async (req, res) => {
 
         const totalAmount = body.unitPrice * body.quantities;
         const finalAmount = totalAmount + (totalAmount*addcharges.amount/100);
-       
+        const orderId =  Math.random().toString().substr(2, 4); 
         const order = new orderModel({
+            orderId: orderId,
             buyerId: mongoose.Types.ObjectId(body.buyerId),
             sellerId: mongoose.Types.ObjectId(body.sellerId),
             enquiryId: mongoose.Types.ObjectId(body.enquiryId),
@@ -60,8 +61,11 @@ const createOrder = async (req, res) => {
         // Pushnotification 
         const showfor = [mongoose.Types.ObjectId('630f472eb83387e6dc0230d0'), mongoose.Types.ObjectId(body.buyerId)];  
         
+        const sellerDetails = await buyerModel.findOne({_id: mongoose.Types.ObjectId(body.sellerId)}, {userCode: 1, _id: 0});
+
+
         const pushnotification = new pushnotificationsModel({
-            message: "One new order generate by seller",
+            message: `One new order generate by ${sellerDetails.userCode}`,
             showFor: showfor,
             redirectTo: "order"
         })                       
