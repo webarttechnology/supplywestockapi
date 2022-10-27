@@ -83,6 +83,15 @@ const updatePayment = async (req, res) => {
     const session = await stripe.checkout.sessions.retrieve(body.session_id); 
     const updateStatus = await orderModel.findOneAndUpdate({stripeId: session.payment_link}, {isPaid: session.payment_status})
 
+    if(session.payment_status == "paid"){
+      const chat = new chatModel({
+        chatroomId: mongoose.Types.ObjectId(updateStatus.chatRoomId),
+        senderId: mongoose.Types.ObjectId(updateStatus.buyerId),
+        message: [{msg: "Payment has been done from buyer end"}]
+      })
+      const data = await chat.save();
+    }
+
     return res.status(200).json({
       success: 1,
       data: session.payment_status
