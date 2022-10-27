@@ -2,7 +2,6 @@ const stripe = require('stripe')('sk_test_51KqwahSGaCSVUxPYRxkYFeHieZHiXtnmyhezB
 const chatModel = require('../chat/chat.service');
 const orderModel = require("../order/order.service");
 const mongoose = require("mongoose");
-const config = require("../../config/config.json");
 
 const requestPaymentLink = async (req, res) => {
     const body = req.body;
@@ -32,7 +31,6 @@ const requestPaymentLink = async (req, res) => {
 const createPaymentLink = async (req, res) => {
 
     const body = req.body;
-    const baseUrl = config.HTTP+req.headers.host;
      const orderObj = await orderModel.findOne({chatRoomId: mongoose.Types.ObjectId(body.chatroomId)}) 
      try{
 
@@ -54,7 +52,7 @@ const createPaymentLink = async (req, res) => {
                 quantity: 1,
               },
             ],
-            after_completion: {type: 'redirect', redirect: {url: `${baseUrl}+/payment/succuess/{CHECKOUT_SESSION_ID}`}},
+            after_completion: {type: 'redirect', redirect: {url: "http://supplywestock.com/payment/succuess/{CHECKOUT_SESSION_ID}"}},
           });
 
 	
