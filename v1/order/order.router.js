@@ -5,7 +5,7 @@ const router = require('express').Router();
 const { checkToken } = require("../../author/token_validations");
 
 
-router.post("/", checkToken, createOrder);
+router.post("/", createOrder);
 router.get("/", checkToken, getOrder);
 router.get("/:id", checkToken, getOrderById);
 router.patch("/", checkToken, updateOrder);

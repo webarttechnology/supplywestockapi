@@ -61,14 +61,14 @@ const createOrder = async (req, res) => {
         // Pushnotification 
         const showfor = [mongoose.Types.ObjectId('630f472eb83387e6dc0230d0'), mongoose.Types.ObjectId(body.buyerId)];  
         
-        const sellerDetails = await buyerModel.findOne({_id: mongoose.Types.ObjectId(body.sellerId)}, {userCode: 1, _id: 0});
-
+        const sellerDetails = await sellerModel.findOne({_id: mongoose.Types.ObjectId(body.sellerId)}, {userCode: 1, _id: 0});
 
         const pushnotification = new pushnotificationsModel({
-            message: `One new order generate by ${sellerDetails.userCode}`,
+            message: `One new order generate by #${sellerDetails.userCode}`,
             showFor: showfor,
             redirectTo: "order"
-        })                       
+        })  
+
         const saveObj = await pushnotification.save();
 
         if(records){
