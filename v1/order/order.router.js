@@ -1,4 +1,4 @@
-const { createOrder, getOrder, getOrderById, updateOrder, deleteOrder, getorderBySellerId, getorderByBuyerId} = require("./order.controller");
+const { createOrder, getOrder, getOrderById, updateOrder, deleteOrder, getorderBySellerId, getorderByBuyerId, getwalletAmount} = require("./order.controller");
 
 const router = require('express').Router();
 
@@ -12,4 +12,5 @@ router.patch("/", checkToken, updateOrder);
 router.delete("/", checkToken, deleteOrder);
 router.get("/seller/:sellerId", getorderBySellerId);
 router.get("/buyer/:buyerId", getorderByBuyerId);
+router.get("/total/balanace/:sellerId", getwalletAmount);
 module.exports = router;

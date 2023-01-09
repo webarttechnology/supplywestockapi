@@ -4,6 +4,7 @@ const enquiryModel = require("../enquiry/enquiry.service");
 const chatModel = require("../chat/chat.service");
 const sellerModel = require("../buyer/buyer.service");
 const chargesModel = require("../additioncharge/charge.service");
+const transactionModel = require("../transaction/transaction.service");
 
 const pushnotificationsModel = require("../pushnotification/pushnotification.service");
 
@@ -270,6 +271,41 @@ const deleteOrder = async (res, req) =>{
     }
 }
 
+const getwalletAmount = async (req, res) => {
+    try{
+
+        const totalAmount = await orderModel.aggregate([
+            {$match: {"isPaid": "unpaid", sellerId: mongoose.Types.ObjectId(req.params.sellerId)}},
+            { $group: { _id: null, orderamount: { $sum: "$totalAmount" } } }            
+        ]);
+
+        const transactionAmount = await transactionModel.aggregate([
+            {$match: {"isPaid": "paid", sellerId: mongoose.Types.ObjectId(req.params.sellerId)}},
+            { $group: { _id: null, transactionAmount: { $sum: "$amount" } } }
+        ]);
+
+       
+       if(totalAmount.length != 0 && transactionAmount.length != 0){
+        var walletBalance = parseFloat(totalAmount[0].orderamount) - parseFloat(transactionAmount[0].transactionAmount);
+       }else if(totalAmount.length != 0 && transactionAmount.length == 0){
+        var walletBalance = parseFloat(totalAmount[0].orderamount);
+       }else{
+        var walletBalance = 0;
+       }
+
+       return res.status(200).json({
+        success: 1,
+        data: walletBalance
+        })
+        
+    }catch(e){
+        return res.status(400).json({
+            success: 0,
+            msg: e
+        })
+    }
+}
+
 module.exports = {
     createOrder: createOrder,
     getOrder: getOrder,
@@ -277,5 +313,6 @@ module.exports = {
     updateOrder: updateOrder,
     deleteOrder: deleteOrder,
     getorderBySellerId: getorderBySellerId,
-    getorderByBuyerId:getorderByBuyerId 
+    getorderByBuyerId:getorderByBuyerId,
+    getwalletAmount: getwalletAmount 
 }

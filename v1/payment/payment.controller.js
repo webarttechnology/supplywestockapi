@@ -112,16 +112,57 @@ const createStripeAccount = async (req, res) => {
       type: 'custom',
       country: 'US',
       email: body.emailId,
+      business_type: "company",
+      tos_acceptance: {date: Math.floor(Date.now()/ 1000), ip: '8.8.8.8'},
+      company: {
+        name: "Supplywestock"
+      },
+      individual: {
+        email: "sankar.webart@gmail.com",
+        first_name: "Sankar",
+        last_name: "Bera",
+        phone: "+12032603736",
+        dob: {
+           day: 16,
+           month: 5,
+           year: 1989
+        },
+        ssn_last_4: "6895"
+      },  
+
+      external_account: {
+        object: "bank_account",
+        country: "US",
+        currency: "usd",
+        account_number: "000123456789",
+        routing_number: "110000000"
+      },
+      "business_profile": {
+        "mcc": "5734",
+        "url": "kaushikprakash.com"
+      },
+      company:{
+        "address": {
+          "city": "Bridgeport",
+          "country": "US",
+          "line1": "261 Harlem Ave",
+          "postal_code": "06606",
+          "state": "CT"
+        },
+        "phone": "+12032603736",
+      },
       capabilities: {
-        card_payments: {requested: true},
         transfers: {requested: true},
       },
     });
 
-    const accountaccept = await stripe.accounts.update(
-      account.id,
-      {tos_acceptance: {date: Math.floor(Date.now()/ 1000), ip: '8.8.8.8'}}
-    );  
+    console.log(account);
+    return false;
+
+    // const accountaccept = await stripe.accounts.update(
+    //   account.id,
+    //   {tos_acceptance: {date: Math.floor(Date.now()/ 1000), ip: '8.8.8.8'}}
+    // );  
 
     const updateSaler = await sellerModel.findOneAndUpdate({'emailId': body.emailId}, {strip_acc: account.id})
 

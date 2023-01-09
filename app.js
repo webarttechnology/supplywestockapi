@@ -8,10 +8,11 @@ dotenv.config();
 const mongodb = require('./db');
 const fs = require('fs');
 
-const httpsServer = require('https').createServer({
-  key: fs.readFileSync('/etc/letsencrypt/live/api.supplywestock.com/privkey.pem'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/api.supplywestock.com/fullchain.pem'),
-}, app);
+// const httpsServer = require('https').createServer({
+//   key: fs.readFileSync('/etc/letsencrypt/live/api.supplywestock.com/privkey.pem'),
+//   cert: fs.readFileSync('/etc/letsencrypt/live/api.supplywestock.com/fullchain.pem'),
+// }, app);
+const httpsServer = require('http').createServer(app);
 
 const cors = require('cors')
 const io = require("socket.io")(httpsServer, {cors: {origin: "*"}})
@@ -29,6 +30,7 @@ const orderRouter = require("./v1/order/order.router");
 const paymentRouter = require('./v1/payment/payment.router');
 const additionalChargesRouter = require("./v1/additioncharge/charge.router");
 const pushnotificationRouter = require("./v1/pushnotification/pushnotification.router");
+const transactionRouter = require("./v1/transaction/transaction.router");
 
 const upload = multer({
 	limits: { fieldSize: 25 * 1024 * 1024 }
@@ -53,8 +55,9 @@ app.use("/v1/order", orderRouter);
 app.use("/v1/payment", paymentRouter);
 app.use("/v1/charges", additionalChargesRouter);
 app.use("/v1/pushnotification", pushnotificationRouter);
+app.use("/v1/transaction", transactionRouter);
 
-httpsServer.listen(configData.PORT, '0.0.0.0', () => {
+httpsServer.listen(configData.PORT, '192.168.1.182', () => {
 	console.log(`Server is running with the port ${configData.PORT}`);
 })
 
