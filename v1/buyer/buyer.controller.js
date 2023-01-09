@@ -30,12 +30,14 @@ const createBuyer = async (req, res) => {
         subject = "Email Verification"
         emailbody = "Your email verification code is "+body.otp
         var transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: "smtpout.secureserver.net", // hostname
+            secureConnection: false, // TLS requires secureConnection to be false
+            port: 465, // port for secure SMTP
             auth: {
               user: configData.SMTP_USER,
               pass: configData.SMTP_PASSWORD
             }
-          });
+        });
           
           var mailOptions = {
             from: 'Supplywestock<'+configData.SMTP_USER+'>',
@@ -117,9 +119,14 @@ const otpverification = async (req, res) => {
             const dataCount = await buyerModle.findOne({emailId: req.params.emailId, otp: req.params.otp}).count();
             if(dataCount){
                 const updateStatus = await buyerModle.findOneAndUpdate({emailId: req.params.emailId}, {isVerified: "1"})
+                const jsontoken = sign({result: updateStatus}, 'SupplyWeStock', {
+                    expiresIn: "1h"
+                });
+               
                 return res.status(200).json({
                     success: 1,
-                    msg: "OTP verified"
+                    msg: "OTP verified",
+                    token_code: jsontoken 
                 })
             }else{
                 return res.status(400).json({
@@ -143,13 +150,16 @@ const sendOtp = async (req, res) => {
             const otp =  Math.random().toString().substr(2, 6); 
             subject = "Email Verification"
             emailbody = `Your Email verification code is ${otp}`
+
             var transporter = nodemailer.createTransport({
-                service: 'gmail',
+                host: "smtpout.secureserver.net", // hostname
+                secureConnection: false, // TLS requires secureConnection to be false
+                port: 465, // port for secure SMTP
                 auth: {
                   user: configData.SMTP_USER,
                   pass: configData.SMTP_PASSWORD
                 }
-              });
+            });
               
               var mailOptions = {
                 from: 'Supplywestock<'+configData.SMTP_USER+'>',
@@ -162,8 +172,7 @@ const sendOtp = async (req, res) => {
 
               const updateOtp = await buyerModle.findOneAndUpdate({_id: mongoose.Types.ObjectId(req.params.id)}, {otp: otp});
               
-              transporter.sendMail(mailOptions, function(error, info){
-          
+              transporter.sendMail(mailOptions, function(error, info){               
                 return res.status(200).json({
                     success: 1,
                     msg: "OTP send to buyer registered Email Id"
@@ -289,12 +298,14 @@ const forgotPassword =  async (req, res) => {
         emailbody = "Your reset password otp is "+body.otp
      
         var transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: "smtpout.secureserver.net", // hostname
+            secureConnection: false, // TLS requires secureConnection to be false
+            port: 465, // port for secure SMTP
             auth: {
               user: configData.SMTP_USER,
               pass: configData.SMTP_PASSWORD
             }
-          });
+        });
           
           var mailOptions = {
             from: 'Supplywestock<'+configData.SMTP_USER+'>',

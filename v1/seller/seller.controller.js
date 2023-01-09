@@ -33,12 +33,14 @@ const createSeller = async (req, res) => {
         subject = "Email Verification"
         emailbody = "Your Email verification code is "+body.otp
         var transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: "smtpout.secureserver.net", // hostname
+            secureConnection: false, // TLS requires secureConnection to be false
+            port: 465, // port for secure SMTP
             auth: {
               user: configData.SMTP_USER,
               pass: configData.SMTP_PASSWORD
             }
-          });
+        });
           
           var mailOptions = {
             from: 'Supplywestock<'+configData.SMTP_USER+'>',
@@ -60,19 +62,13 @@ const createSeller = async (req, res) => {
             otp: body.otp,
             roleId: "2"
         })
-        const buyer = await buyerObj.save();
-
-
-        const jsontoken = sign({result: buyer}, '', {
-            expiresIn: "1h"
-        });
+        const buyer = await buyerObj.save();     
 
         transporter.sendMail(mailOptions, function(error, info){
           
             return res.status(200).json({
                 success: 1,
-                data: buyer,
-                token_code: jsontoken
+                data: buyer
             }) 
          });  
         
@@ -87,7 +83,7 @@ const createSeller = async (req, res) => {
 
 const getSeller = async (req, res) => {
     try{
-        const seller = await sellerModel.find({"roleId": "2"}, {firstName: 1, lastName: 1, mobileNo: 1, emailId: 1, address: 1, city: 1, pincode: 1, state: 1, _id: 1, isVerified: 1})
+        const seller = await sellerModel.find({"roleId": "2"}, {firstName: 1, strip_acc: 1, lastName: 1, mobileNo: 1, emailId: 1, address: 1, city: 1, pincode: 1, state: 1, _id: 1, isVerified: 1})
         return res.status(200).json({
             success: 1,
             data: seller
@@ -140,7 +136,7 @@ const getSellerById = async (req, res) => {
         $match: {_id: mongoose.Types.ObjectId(req.params.id)}
        },
        {
-        $project: {firstName: 1, lastName: 1, mobileNo: 1, emailId: 1, address: 1, city: 1, pincode: 1, state: 1, _id: 0, isVerified: 1, "manufacturer.name":1, "manufacturer.image":1, "manufacturer._id":1,}
+        $project: {firstName: 1, lastName: 1, mobileNo: 1, strip_acc: 1, emailId: 1, address: 1, city: 1, pincode: 1, state: 1, _id: 0, isVerified: 1, "manufacturer.name":1, "manufacturer.image":1, "manufacturer._id":1,}
        },
     ])
      
@@ -192,12 +188,14 @@ const sendOtp = async (req, res) => {
             subject = "Email Verification"
             emailbody = `Your Email verification code is ${otp}`
             var transporter = nodemailer.createTransport({
-                service: 'gmail',
+                host: "smtpout.secureserver.net", // hostname
+                secureConnection: false, // TLS requires secureConnection to be false
+                port: 465, // port for secure SMTP
                 auth: {
                   user: configData.SMTP_USER,
                   pass: configData.SMTP_PASSWORD
                 }
-              });
+            });
               
               var mailOptions = {
                 from: 'Supplywestock<'+configData.SMTP_USER+'>',
@@ -237,9 +235,16 @@ const otpverification = async (req, res) => {
         const dataCount = await sellerModel.findOne({emailId: req.params.emailId, otp: req.params.otp}).count();
         if(dataCount){
             const updateStatus = await sellerModel.findOneAndUpdate({emailId: req.params.emailId}, {isVerified: "1"})
+
+            const jsontoken = sign({result: updateStatus}, 'SupplyWeStock', {
+                expiresIn: "1h"
+            });
+
+
             return res.status(200).json({
                 success: 1,
-                msg: "OTP verified"
+                msg: "OTP verified",
+                token_code: jsontoken
             })
         }else{
             return res.status(400).json({
@@ -262,8 +267,8 @@ const login = async (req, res) => {
         if(sellerData){
 
             const encryresult = compareSync(body.password, sellerData.password);
-            if(encryresult){
 
+            if(encryresult){
                 const jsontoken = sign({result: sellerData}, 'SupplyWeStock', {
                     expiresIn: "1h"
                 });
@@ -308,12 +313,14 @@ const forgotPassword =  async (req, res) => {
         emailbody = "Your reset password otp is "+body.otp
      
         var transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: "smtpout.secureserver.net", // hostname
+            secureConnection: false, // TLS requires secureConnection to be false
+            port: 465, // port for secure SMTP
             auth: {
               user: configData.SMTP_USER,
               pass: configData.SMTP_PASSWORD
             }
-          });
+        });
           
           var mailOptions = {
             from: 'Supplywestock<'+configData.SMTP_USER+'>',

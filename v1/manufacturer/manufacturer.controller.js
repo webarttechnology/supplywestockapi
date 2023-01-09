@@ -12,6 +12,8 @@ const createManufacturer = async (req, res) => {
             let buffer = Buffer.from(body.image.split(',')[1], 'base64');
             fs.writeFileSync(path.join(__dirname, imagepath), buffer);
             body.image = 'images/'+imagename;
+        }else{
+            body.image = ""; 
         } 
 
         const manufacturer = new manufacturerModel({

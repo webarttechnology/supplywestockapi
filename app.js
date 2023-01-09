@@ -6,10 +6,16 @@ const dotenv = require('dotenv');
 const configData = require("./config/config.json");
 dotenv.config();
 const mongodb = require('./db');
-const http = require('http').createServer(app);
-const cors = require('cors')
-const io = require("socket.io")(http, {cors: {origin: "*"}})
+const fs = require('fs');
 
+const httpsServer = require('https').createServer({
+  key: fs.readFileSync('/etc/letsencrypt/live/api.supplywestock.com/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/api.supplywestock.com/fullchain.pem'),
+}, app);
+
+const cors = require('cors')
+const io = require("socket.io")(httpsServer, {cors: {origin: "*"}})
+//const fs = require('fs');
 const buyerRouter = require("./v1/buyer/buyer.router");
 const sellerRouter = require("./v1/seller/seller.router");
 const manufacturerRouter = require("./v1/manufacturer/manufacturer.router");
@@ -48,8 +54,7 @@ app.use("/v1/payment", paymentRouter);
 app.use("/v1/charges", additionalChargesRouter);
 app.use("/v1/pushnotification", pushnotificationRouter);
 
-
-http.listen(configData.PORT, '0.0.0.0', () => {
+httpsServer.listen(configData.PORT, '0.0.0.0', () => {
 	console.log(`Server is running with the port ${configData.PORT}`);
 })
 
@@ -60,7 +65,7 @@ const { mongoose } = require("mongoose");
 
 io.on('connection', async function(socket){
 
-  socket.on('createChat', async function(msg){
+socket.on('createChat', async function(msg){
 
     
 
@@ -112,8 +117,7 @@ io.on('connection', async function(socket){
           $project: {"user.firstName": 1, "user.lastName": 1, "chatroomId": 1, 'user.userCode': 1, senderId: 1, message: 1, createdAt: 1}
       }])
 
-        console.log(getAllMsg);
-	socket.broadcast.emit('receiveChat', getAllMsg);
+       socket.broadcast.emit('receiveChat', getAllMsg);
   })
  
 socket.on('chatroom', async function(msg){ 
@@ -175,7 +179,7 @@ socket.on('chatroom', async function(msg){
 // For notification 
 
 socket.on('notification', async (data) => {
-    const pushObj  = await pushnotificationModel.find({showFor: mongoose.Types.ObjectId(data.id)}, {message: 1, redirectTo: 1, _id: 0, showFor: 1})
+    const pushObj  = await pushnotificationModel.find({showFor: mongoose.Types.ObjectId(data.id), "isShow": "0"}, {message: 1, redirectTo: 1, _id: 1, showFor: 1})
     const notificationData = {notification: pushObj, show: data.id}
     socket.broadcast.emit('receiveNotification', notificationData);
 })

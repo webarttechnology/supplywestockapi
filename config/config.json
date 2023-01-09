@@ -2,7 +2,7 @@
     "MONGOOSE_URL": "mongodb://sankar008:ahpghjclqltxiryu@172.105.63.248:27017/ecommercemanufacturers?authSource=admin",
     "PORT": 3001,
     "NODE_ENV": "Test",
-    "SMTP_USER": "sankar.webart@gmail.com",
-    "SMTP_PASSWORD": "ktjrudspgnkuudso",
-    "HTTP": "http://"
+    "SMTP_USER": "noreply@supplywestock.com",
+    "SMTP_PASSWORD": "supplywestock@noreply",
+    "HTTP": "https://"
 }

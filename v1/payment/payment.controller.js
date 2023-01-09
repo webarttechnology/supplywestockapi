@@ -1,6 +1,7 @@
-const stripe = require('stripe')('sk_test_51KqwahSGaCSVUxPYRxkYFeHieZHiXtnmyhezBLiOZJSFC19FCvPeQDq3kDEzqjRgReDrgMARZns8YDuwUCeLeK1D00tMoJCkqG');
+const stripe = require('stripe')('sk_test_51MCHiwINOV0G9TVn88bG12kf8LobjCMJo4MJQA45PGv02R1qdmRD7Zm5jx1dgxkieWaHXUWIBmdMpls8nWDtVTPz006igXYQWL');
 const chatModel = require('../chat/chat.service');
 const orderModel = require("../order/order.service");
+const sellerModel = require("../buyer/buyer.service");
 const mongoose = require("mongoose");
 
 const requestPaymentLink = async (req, res) => {
@@ -87,7 +88,7 @@ const updatePayment = async (req, res) => {
       const chat = new chatModel({
         chatroomId: mongoose.Types.ObjectId(updateStatus.chatRoomId),
         senderId: mongoose.Types.ObjectId(updateStatus.buyerId),
-        message: [{msg: "Payment has been done from buyer end"}]
+        message: [{msg: "Payment processed"}]
       })
       const data = await chat.save();
     }
@@ -104,8 +105,56 @@ const updatePayment = async (req, res) => {
 
 }
 
+const createStripeAccount = async (req, res) => {
+  const body = req.body;
+  try{
+    const account = await stripe.accounts.create({
+      type: 'custom',
+      country: 'US',
+      email: body.emailId,
+      capabilities: {
+        card_payments: {requested: true},
+        transfers: {requested: true},
+      },
+    });
+
+    const accountaccept = await stripe.accounts.update(
+      account.id,
+      {tos_acceptance: {date: Math.floor(Date.now()/ 1000), ip: '8.8.8.8'}}
+    );  
+
+    const updateSaler = await sellerModel.findOneAndUpdate({'emailId': body.emailId}, {strip_acc: account.id})
+
+    return res.status(200).json({
+      success: 1,
+      msg: "Account activation successfully"
+    })
+  }catch(e){
+    return res.status(400).json(e)
+  }
+}
+
+const transferMoney =  async (req, res) => {
+   const body = req.body;
+   try{
+      const transfer = await stripe.transfers.create({
+        amount: 1,
+        currency: 'usd',
+        destination: 'acct_1MKGkAIqXcPQfOBI',
+        transfer_group: 'ORDER_95',
+      });
+
+      console.log(transfer);
+      return false;
+   }catch(e){
+    return res.status(400).json(e)
+   }
+}  
+
 module.exports = {
     createPaymentLink: createPaymentLink,
     requestPaymentLink: requestPaymentLink,
-    updatePayment:updatePayment
+    updatePayment:updatePayment,
+    createStripeAccount: createStripeAccount,
+    transferMoney: transferMoney
 }

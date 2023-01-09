@@ -113,12 +113,14 @@ const forgotPassword =  async (req, res) => {
         emailbody = "Your reset password otp is "+body.otp
      
         var transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: "smtpout.secureserver.net", // hostname
+            secureConnection: false, // TLS requires secureConnection to be false
+            port: 465, // port for secure SMTP
             auth: {
               user: configData.SMTP_USER,
               pass: configData.SMTP_PASSWORD
             }
-          });
+        });
           
           var mailOptions = {
             from: 'Supplyandstock<'+configData.SMTP_USER+'>',
