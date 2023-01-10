@@ -11,6 +11,7 @@ const buyerSchema = mongoose.Schema({
     pincode: {type: String},
     state: {type: String},
     otp: {type: String},
+    strip_acc: {type: String},
     isVerified: {type: String, Enum: ["0", "1"], default: "0"},
     manufacturer: {type: Array},
     roleId: {type: String, Enum: ["1", "2", "3"], required: [true, "Role is a require field"]}  // 1 For admin, 2 for Seller, 3 for buyer
