@@ -7,7 +7,6 @@ const mongoose = require("mongoose");
 const requestPaymentLink = async (req, res) => {
     const body = req.body;
     try{
-
       const chat = new chatModel({
         chatroomId: mongoose.Types.ObjectId(body.chatroomId),
         senderId: mongoose.Types.ObjectId(body.buyerId),
@@ -105,62 +104,34 @@ const updatePayment = async (req, res) => {
 
 }
 
-const createStripeAccount = async (req, res) => {
+const accountActivation = async (req, res) => {
   const body = req.body;
- 
   try{
-    const account = await stripe.accounts.create(body);
-    // const account = await stripe.accounts.create({
-    //   type: 'custom',
-    //   country: 'US',
-    //   email: body.emailId,
-    //   business_type: "individual",
-    //   tos_acceptance: {date: Math.floor(Date.now()/ 1000), ip: '8.8.8.8'},    
-    //   individual: {
-    //     email: "sankar.webart@gmail.com",
-    //     first_name: "Sankar",
-    //     last_name: "Bera",
-    //     phone: "+12032603736",
-    //     dob: {
-    //        day: 16,
-    //        month: 5,
-    //        year: 1989
-    //     },
-    //     ssn_last_4: "6895"
-    //   },  
+    const updateSaler = await sellerModel.findOneAndUpdate({'_id': mongoose.Types.ObjectId(body.id), 'strip_acc': {$ne: ''}}, {isActive: '1'});   
+    return res.status(200).json({
+      success: 1,
+      message: "Account acctivation successfully."
+    });  
+  }catch(e){
+    return res.status(400).json(e)
+  }
+}
 
-    //   external_account: {
-    //     object: "bank_account",
-    //     country: "US",
-    //     currency: "usd",
-    //     account_number: "000123456789",
-    //     routing_number: "110000000"
-    //   },
-    //   "business_profile": {
-    //     "mcc": "5734",
-    //     "url": "kaushikprakash.com"
-    //   },
-    //   company:{
-    //     "address": {
-    //       "city": "Bridgeport",
-    //       "country": "US",
-    //       "line1": "261 Harlem Ave",
-    //       "postal_code": "06606",
-    //       "state": "CT"
-    //     },
-    //     "phone": "+12032603736",
-    //   },
-    //   capabilities: {
-    //     transfers: {requested: true},
-    //   },
-    // });
-
-
-    if(account.id != ''){    
+const createStripeAccount = async (req, res) => {
+  const body = req.body;  
+  try{
+    const account = await stripe.accounts.create(body); 
+    if(account.id != ''){ 
+      const accountLink = await stripe.accountLinks.create({
+        account: account.id,
+        refresh_url: 'https://supplywestock.com/user-dashboard',
+        return_url: 'https://supplywestock.com/active-account',
+        type: 'account_onboarding',
+      });     
       const updateSaler = await sellerModel.findOneAndUpdate({'emailId': body.email}, {strip_acc: account.id});     
       return res.status(200).json({
         success: 1,
-        msg: "Account activation successfully"
+        url: accountLink.url
       });
     }else{
       return res.status(400).json({
@@ -196,5 +167,6 @@ module.exports = {
     requestPaymentLink: requestPaymentLink,
     updatePayment:updatePayment,
     createStripeAccount: createStripeAccount,
-    transferMoney: transferMoney
+    transferMoney: transferMoney,
+    accountActivation: accountActivation
 }

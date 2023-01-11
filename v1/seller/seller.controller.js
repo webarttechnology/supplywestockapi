@@ -121,8 +121,7 @@ const updateSeller = async (req, res) => {
 }
 
 const getSellerById = async (req, res) => {
-    try{        
-       
+    try{       
        const data = await sellerModel.aggregate([
         {
             $lookup: {
@@ -136,7 +135,7 @@ const getSellerById = async (req, res) => {
         $match: {_id: mongoose.Types.ObjectId(req.params.id)}
        },
        {
-        $project: {firstName: 1, lastName: 1, mobileNo: 1, strip_acc: 1, emailId: 1, address: 1, city: 1, pincode: 1, state: 1, _id: 0, isVerified: 1, "manufacturer.name":1, "manufacturer.image":1, "manufacturer._id":1,}
+        $project: {firstName: 1, lastName: 1, mobileNo: 1, strip_acc: 1, emailId: 1, address: 1, city: 1, pincode: 1, state: 1, _id: 0, isVerified: 1, "manufacturer.name":1, "manufacturer.image":1, "manufacturer._id":1, "isActive": 1}
        },
     ])
      
