@@ -273,9 +273,8 @@ const deleteOrder = async (res, req) =>{
 
 const getwalletAmount = async (req, res) => {
     try{
-
         const totalAmount = await orderModel.aggregate([
-            {$match: {"isPaid": "unpaid", sellerId: mongoose.Types.ObjectId(req.params.sellerId)}},
+            {$match: {"isPaid": "paid", sellerId: mongoose.Types.ObjectId(req.params.sellerId)}},
             { $group: { _id: null, orderamount: { $sum: "$totalAmount" } } }            
         ]);
 
@@ -283,7 +282,6 @@ const getwalletAmount = async (req, res) => {
             {$match: {"isPaid": "paid", sellerId: mongoose.Types.ObjectId(req.params.sellerId)}},
             { $group: { _id: null, transactionAmount: { $sum: "$amount" } } }
         ]);
-
        
        if(totalAmount.length != 0 && transactionAmount.length != 0){
         var walletBalance = parseFloat(totalAmount[0].orderamount) - parseFloat(transactionAmount[0].transactionAmount);

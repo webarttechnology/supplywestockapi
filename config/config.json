@@ -4,5 +4,6 @@
     "NODE_ENV": "Test",
     "SMTP_USER": "noreply@supplywestock.com",
     "SMTP_PASSWORD": "supplywestock@noreply",
+    "STRIPE_ACCOUNT": "sk_test_51MCHiwINOV0G9TVn88bG12kf8LobjCMJo4MJQA45PGv02R1qdmRD7Zm5jx1dgxkieWaHXUWIBmdMpls8nWDtVTPz006igXYQWL",
     "HTTP": "https://"
 }

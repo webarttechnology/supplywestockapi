@@ -1,9 +1,9 @@
-const stripe = require('stripe')('sk_test_51MCHiwINOV0G9TVn88bG12kf8LobjCMJo4MJQA45PGv02R1qdmRD7Zm5jx1dgxkieWaHXUWIBmdMpls8nWDtVTPz006igXYQWL');
+const configData = require("./../../config/config.json");
+const stripe = require('stripe')(configData.STRIPE_ACCOUNT);
 const chatModel = require('../chat/chat.service');
 const orderModel = require("../order/order.service");
 const sellerModel = require("../buyer/buyer.service");
 const mongoose = require("mongoose");
-
 const requestPaymentLink = async (req, res) => {
     const body = req.body;
     try{
@@ -145,6 +145,21 @@ const createStripeAccount = async (req, res) => {
   }
 }
 
+const getStripeAccountDetails = async (req, res) => {
+  try{
+    const account = await stripe.accounts.retrieve(
+      req.params.strip_acc
+    );
+
+    return res.status(200).json({
+      success: 1,
+      data: account
+    })
+  }catch(e){
+    return res.status(400).json(e)
+  }
+}
+
 const transferMoney =  async (req, res) => {
    const body = req.body;
    try{
@@ -152,7 +167,6 @@ const transferMoney =  async (req, res) => {
         amount: 1,
         currency: 'usd',
         destination: 'acct_1MKGkAIqXcPQfOBI',
-        transfer_group: 'ORDER_95',
       });
 
       console.log(transfer);
@@ -168,5 +182,6 @@ module.exports = {
     updatePayment:updatePayment,
     createStripeAccount: createStripeAccount,
     transferMoney: transferMoney,
-    accountActivation: accountActivation
+    accountActivation: accountActivation,
+    getStripeAccountDetails: getStripeAccountDetails
 }
